@@ -3,143 +3,249 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relógio Digital - Brasília & Previsão do Tempo</title>
+    <title>Relógio Digital - Brasília & Clima Google</title>
     <style>
-        /* ----------------------------------------------------------------- */
-        /* ESTILOS BASE E CENTRALIZAÇÃO */
-        /* ----------------------------------------------------------------- */
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             background-color: #000;
-            color: #ccc; 
+            color: #e8eaed; 
             min-height: 100vh;
             margin: 0;
             display: flex;
             flex-direction: column;
             justify-content: center; 
             align-items: center; 
-            font-family: Arial, sans-serif;
+            font-family: Roboto, Arial, sans-serif;
             padding: 20px;
-            box-sizing: border-box;
         }
 
         #relogio {
             color: #ffffff; 
-            font-size: 8em;
+            font-size: 7.5em;
             font-weight: bold;
-            text-shadow: 0 0 0px rgba(255, 255, 255, 0.8);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
             white-space: nowrap; 
             padding: 0 10px;
             text-align: center;
-            margin-bottom: 15px;
-        }
-
-        /* ----------------------------------------------------------------- */
-        /* ESTILOS DO CLIMA (ESTILO GOOGLE CLIMA ESCURO) */
-        /* ----------------------------------------------------------------- */
-        #previsao-container {
-            background-color: #000;
-            color: #fff;
-            max-width: 650px;
-            width: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-
-        .local-data {
-            font-size: 0.95em;
-            color: #e0e0e0;
-            margin-bottom: 12px;
-        }
-
-        .clima-principal {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-
-        .icone-temperatura-grande {
-            font-size: 3.5em;
-            line-height: 1;
-        }
-
-        .bloco-temp-nums {
-            display: flex;
-            align-items: flex-start;
-            font-size: 3.5em;
-            font-weight: 300;
-        }
-
-        .unidade-temp {
-            font-size: 0.35em;
-            margin-top: 5px;
-            color: #aaa;
-            font-weight: normal;
-        }
-
-        .status-chuva {
             margin-bottom: 25px;
         }
 
-        .status-chuva .titulo-condicao {
-            font-size: 1.5em;
-            font-weight: 400;
-            margin-bottom: 5px;
+        /* ----------------------------------------------------------------- */
+        /* ESTILO DO CARD DO GOOGLE CLIMA */
+        /* ----------------------------------------------------------------- */
+        #previsao-container {
+            background-color: #17191c;
+            color: #e8eaed;
+            max-width: 580px;
+            width: 100%;
+            padding: 22px;
+            border-radius: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
         }
 
-        .status-chuva .detalhes-condicao {
+        /* Barra de localização e seletor */
+        .topo-localizacao {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
             font-size: 0.95em;
-            color: #ccc;
+            color: #9aa0a6;
+            border-bottom: 1px solid #2d3139;
+            padding-bottom: 12px;
         }
 
-        /* Previsão para a semana (Grade) */
-        .grade-semana {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
+        .local-info {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #e8eaed;
+            font-weight: 500;
+        }
+
+        .btn-escolher {
+            background: none;
+            border: none;
+            color: #8ab4f8;
+            cursor: pointer;
+            font-size: 0.95em;
+            padding: 0;
+        }
+
+        .btn-escolher:hover {
+            text-decoration: underline;
+        }
+
+        /* Caixa de input oculta para digitar a cidade */
+        #painel-busca {
+            display: none;
+            margin-bottom: 15px;
             gap: 8px;
-            text-align: center;
-            border-top: 1px solid #222;
-            padding-top: 20px;
         }
 
-        .dia-coluna {
+        #painel-busca input {
+            flex: 1;
+            background: #202124;
+            border: 1px solid #5f6368;
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 0.9em;
+        }
+
+        #painel-busca button {
+            background: #8ab4f8;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            color: #202124;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        h2.titulo-secao {
+            font-size: 1.4em;
+            font-weight: 400;
+            margin: 0 0 16px 0;
+            color: #e8eaed;
+        }
+
+        /* Seção Agora (Temperatura grande + Ícone) */
+        .bloco-agora {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .temp-principal-box {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .numero-temperatura {
+            font-size: 4.5em;
+            font-weight: 300;
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+
+        .icone-grande {
+            font-size: 3.5em;
+            margin-left: 10px;
+        }
+
+        .detalhes-celestial {
+            text-align: right;
+        }
+
+        .condicao-texto {
+            font-size: 1.25em;
+            font-weight: 400;
+            margin-bottom: 4px;
+        }
+
+        .sensacao-termica {
+            font-size: 0.9em;
+            color: #9aa0a6;
+        }
+
+        /* Alerta meteorológico (Estilo Google) */
+        .alerta-caixa {
+            background-color: #3c2427;
+            border-left: 4px solid #f28b82;
+            padding: 10px 14px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85em;
+            color: #f6aea9;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Previsão por hora (Horária) */
+        .previsao-horas {
+            display: flex;
+            justify-content: space-between;
+            overflow-x: auto;
+            gap: 12px;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #2d3139;
+            text-align: center;
+        }
+
+        .hora-coluna {
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-width: 45px;
             font-size: 0.85em;
+            color: #9aa0a6;
+        }
+
+        .hora-coluna .temp-h {
+            color: #e8eaed;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .hora-coluna .icone-h {
+            font-size: 1.3em;
+            margin-bottom: 8px;
+        }
+
+        /* Previsão Diária (Cards de Dias da Semana) */
+        .previsao-dias {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .dia-card {
+            background-color: #202124;
+            border: 1px solid transparent;
+            border-radius: 14px;
+            padding: 12px 8px;
+            text-align: center;
+            flex: 1;
+            min-width: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: 0.2s;
+        }
+
+        .dia-card.ativo {
+            border-color: #8ab4f8;
+            background-color: #282a2d;
         }
 
         .dia-nome {
-            color: #e0e0e0;
+            font-size: 0.8em;
+            color: #9aa0a6;
             margin-bottom: 8px;
+            text-transform: lowercase;
         }
 
         .dia-icone {
             font-size: 1.4em;
-            margin-bottom: 8px;
-            min-height: 25px;
+            margin-bottom: 10px;
         }
 
-        .dia-prob {
-            color: #8ab4f8;
+        .dia-temp {
             font-size: 0.8em;
-            margin-bottom: 8px;
-            font-weight: bold;
+            color: #e8eaed;
+            font-weight: 500;
+            line-height: 1.3;
         }
 
-        .dia-temps {
-            font-size: 0.8em;
-            color: #bbb;
-            line-height: 1.2;
-        }
-
-        .dia-temps .max {
-            color: #fff;
-        }
-
-        .dia-temps .min {
-            color: #999;
+        .dia-temp .min {
+            color: #9aa0a6;
         }
 
         /* ----------------------------------------------------------------- */
@@ -147,20 +253,13 @@
         /* ----------------------------------------------------------------- */
         @media (max-width: 768px) {
             #relogio {
-                font-size: 5.5em;
-            }
-            .grade-semana {
-                overflow-x: auto;
-                justify-content: space-between;
-            }
-            .dia-coluna {
-                min-width: 65px;
+                font-size: 5em;
             }
         }
 
         @media (max-width: 480px) {
             #relogio {
-                font-size: 3.8em;
+                font-size: 3.5em;
             }
         }
     </style>
@@ -169,32 +268,64 @@
 
     <div id="relogio">--:--:--</div>
 
-    <!-- Seção de Previsão do Tempo estilo Google -->
+    <!-- Container estilo Google Clima -->
     <div id="previsao-container">
-        <div id="local-data" class="local-data">Carregando data...</div>
-        
-        <div class="clima-principal">
-            <div id="icone-principal" class="icone-temperatura-grande">⏳</div>
-            <div class="bloco-temp-nums">
-                <span id="temp-atual">--</span>
-                <div class="unidade-temp">°C | °F</div>
+        <!-- Topo com Cidade Atual e Botão de Escolher Região -->
+        <div class="topo-localizacao">
+            <div class="local-info">
+                📍 <span id="cidade-exibida">Barcelona - RN</span>
+            </div>
+            <button class="btn-escolher" onclick="toggleBusca()">Escolher região</button>
+        </div>
+
+        <!-- Input para digitar outra cidade -->
+        <div id="painel-busca">
+            <input type="text" id="input-cidade" placeholder="Digite a cidade (ex: São Paulo, SP)">
+            <button onclick="buscarOutraCidade()">Buscar</button>
+        </div>
+
+        <h2 class="titulo-secao">Clima</h2>
+
+        <!-- Bloco "Agora" -->
+        <div class="bloco-agora">
+            <div>
+                <div style="font-size: 0.9em; color: #9aa0a6; margin-bottom: 4px;">Agora</div>
+                <div class="temp-principal-box">
+                    <span id="temp-atual" class="numero-temperatura">--</span>
+                    <span id="icone-agora" class="icone-grande">🌙</span>
+                </div>
+            </div>
+            <div class="detalhes-celestial">
+                <div id="condicao-atual" class="condicao-texto">Carregando...</div>
+                <div id="sensacao-termica" class="sensacao-termica">Sensação térmica: --°</div>
             </div>
         </div>
 
-        <div class="status-chuva">
-            <div id="condicao-atual" class="titulo-condicao">Atualizando clima...</div>
-            <div id="detalhes-atual" class="detalhes-condicao">Máxima: --° &nbsp;&nbsp; Mínima: --° &nbsp;&nbsp; Chuva: --%</div>
+        <!-- Alerta Meteorológico Fictício/Dinâmico -->
+        <div class="alerta-caixa">
+            <span id="texto-alerta">⚠️ Alerta: condições estáveis na região.</span>
+            <span>&gt;</span>
         </div>
 
-        <div class="grade-semana" id="grade-semana">
-            <!-- Preenchido via JavaScript em tempo real -->
+        <!-- Previsão por Horas -->
+        <div class="previsao-horas" id="container-horas">
+            <!-- Preenchido via JS -->
+        </div>
+
+        <!-- Previsão Diária (Dias da Semana) -->
+        <div class="previsao-dias" id="container-dias">
+            <!-- Preenchido via JS -->
         </div>
     </div>
 
     <script>
         let wakeLock = null;
+        let cidadeAtualNome = "Barcelona - RN";
+        // Coordenadas padrão (Barcelona, RN)
+        let latAtual = -6.02;
+        let lonAtual = -35.93;
 
-        // Função para atualizar a hora (Hora de Brasília)
+        // Função para atualizar o relógio (Brasília)
         function atualizarRelogio() {
             const agora = new Date();
             const opcoes = {
@@ -204,7 +335,6 @@
                 second: '2-digit',
                 hour12: false
             };
-
             const horaFormatada = agora.toLocaleTimeString('pt-BR', opcoes);
             const elementoRelogio = document.getElementById('relogio');
             if (elementoRelogio) {
@@ -212,93 +342,141 @@
             }
         }
 
-        // Função para buscar dados meteorológicos reais de Barcelona, RN via Open-Meteo API
+        // Exibe ou oculta o input de busca de cidade
+        function toggleBusca() {
+            const painel = document.getElementById('painel-busca');
+            painel.style.display = painel.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        // Busca nova cidade utilizando geocodificação aberta do Open-Meteo
+        async function buscarOutraCidade() {
+            const query = document.getElementById('input-cidade').value.trim();
+            if (!query) return;
+
+            try {
+                const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=pt&format=json`;
+                const res = await fetch(geoUrl);
+                const data = await res.json();
+
+                if (data.results && data.results.length > 0) {
+                    const loc = data.results[0];
+                    latAtual = loc.latitude;
+                    lonAtual = loc.longitude;
+                    cidadeAtualNome = `${loc.name}${loc.admin1 ? ' - ' + loc.admin1 : ''}`;
+                    
+                    document.getElementById('cidade-exibida').textContent = cidadeAtualNome;
+                    document.getElementById('painel-busca').style.display = 'none';
+                    document.getElementById('input-cidade').value = '';
+                    
+                    atualizarClima();
+                } else {
+                    alert('Cidade não encontrada.');
+                }
+            } catch (err) {
+                console.error("Erro na busca de cidade:", err);
+            }
+        }
+
+        // Função principal para buscar dados de clima em tempo real
         async function atualizarClima() {
             try {
-                // Coordenadas aproximadas para Barcelona, RN (-6.02, -35.93)
-                const latitude = -6.02;
-                const longitude = -35.93;
-                
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=America%2FSao_Paulo`;
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${latAtual}&longitude=${lonAtual}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=America%2FSao_Paulo`;
 
                 const resposta = await fetch(url);
                 const dados = await resposta.json();
 
-                // Atualizar Data atual formatada (Ex: "Domingo • Barcelona, RN")
-                const hojeObj = new Date();
-                const diasSemanaExtenso = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-                const nomeDiaHoje = diasSemanaExtenso[hojeObj.getDay()];
-                document.getElementById('local-data').textContent = `${nomeDiaHoje} • Barcelona, RN`;
-
-                // Dados Atuais
+                // Clima Atual
                 const tempAtual = Math.round(dados.current.temperature_2m);
+                const sensacao = Math.round(dados.current.apparent_temperature);
+                const isDay = dados.current.is_day;
                 const wcode = dados.current.weather_code;
-                const infoClima = traduzirCodigoClima(wcode);
+                const infoClima = traduzirCodigoClima(wcode, isDay);
 
                 document.getElementById('temp-atual').textContent = tempAtual;
-                document.getElementById('icone-principal').textContent = infoClima.icone;
+                document.getElementById('icone-agora').textContent = infoClima.icone;
                 document.getElementById('condicao-atual').textContent = infoClima.descricao;
+                document.getElementById('sensacao-termica').textContent = `Sensação térmica: ${sensacao}°`;
 
-                // Pegar máximas e mínimas do dia atual
-                const maxHoje = Math.round(dados.daily.temperature_2m_max[0]);
-                const minHoje = Math.round(dados.daily.temperature_2m_min[0]);
-                const chuvaHoje = dados.daily.precipitation_probability_max[0] ?? 0;
-
-                document.getElementById('detalhes-atual').innerHTML = `Máxima: ${maxHoje}° &nbsp;&nbsp; Mínima: ${minHoje}° &nbsp;&nbsp; Chuva: ${chuvaHoje}%`;
-
-                // Previsão dos 7 dias da semana
-                const gradeSemana = document.getElementById('grade-semana');
-                gradeSemana.innerHTML = '';
-
-                const diasCurtos = ['dom.', 'seg.', 'ter.', 'qua.', 'qui.', 'sex. कहें', 'sáb.'];
+                // Renderizar Horas (próximas 6 horas a partir da hora atual)
+                const containerHoras = document.getElementById('container-horas');
+                containerHoras.innerHTML = '';
                 
-                for (let i = 0; i < 7; i++) {
-                    const dataIndice = new Date();
-                    dataIndice.setDate(hojeObj.getDate() + i);
-                    const diaSemanaStr = ['dom.', 'seg.', 'ter.', 'qua.', 'qui.', 'sex.', 'sáb.'][dataIndice.getDay()];
+                const horaAtualIndice = new Date().getHours();
+                for (let i = 0; i < 6; i++) {
+                    const indiceH = (horaAtualIndice + i) % 24;
+                    const tempH = Math.round(dados.hourly.temperature_2m[indiceH] || tempAtual);
+                    const codeH = dados.hourly.weather_code[indiceH] || wcode;
+                    const climaH = traduzirCodigoClima(codeH, (indiceH >= 6 && indiceH <= 18 ? 1 : 0));
+                    
+                    const labelHora = i === 0 ? 'Agora' : `${String(indiceH).padStart(2, '0')}:00`;
 
-                    const codeDia = dados.daily.weather_code[i];
-                    const climaDia = traduzirCodigoClima(codeDia);
-                    const maxDia = Math.round(dados.daily.temperature_2m_max[i]);
-                    const minDia = Math.round(dados.daily.temperature_2m_min[i]);
-                    const probChuvaDia = dados.daily.precipitation_probability_max[i] ?? 0;
-
-                    const colunaHtml = `
-                        <div class="dia-coluna">
-                            <span class="dia-nome">${i === 0 ? 'hoje' : diaSemanaStr}</span>
-                            <span class="dia-icone">${climaDia.icone}</span>
-                            <span class="dia-prob">${probChuvaDia}%</span>
-                            <span class="dia-temps"><span class="max">${maxDia}°</span><br><span class="min">${minDia}°</span></span>
+                    containerHoras.innerHTML += `
+                        <div class="hora-coluna">
+                            <span class="temp-h">${tempH}°</span>
+                            <span class="icone-h">${climaH.icone}</span>
+                            <span>${labelHora}</span>
                         </div>
                     `;
-                    gradeSemana.innerHTML += colunaHtml;
+                }
+
+                // Renderizar Dias da Semana (7 dias)
+                const containerDias = document.getElementById('container-dias');
+                containerDias.innerHTML = '';
+                
+                const diasSemanaNomes = ['dom.', 'seg.', 'ter.', 'qua.', 'qui.', 'sex.', 'sáb.'];
+                const hojeObj = new Date();
+
+                for (let i = 0; i < 7; i++) {
+                    const dataCard = new Date();
+                    dataCard.setDate(hojeObj.getDate() + i);
+                    const nomeDia = i === 0 ? diasSemanaNomes[hojeObj.getDay()] : diasSemanaNomes[dataCard.getDay()];
+
+                    const maxD = Math.round(dados.daily.temperature_2m_max[i]);
+                    const minD = Math.round(dados.daily.temperature_2m_min[i]);
+                    const codeD = dados.daily.weather_code[i];
+                    const climaD = traduzirCodigoClima(codeD, 1);
+
+                    containerDias.innerHTML += `
+                        <div class="dia-card ${i === 0 ? 'ativo' : ''}">
+                            <span class="dia-nome">${nomeDia}</span>
+                            <span class="dia-icone">${climaD.icone}</span>
+                            <span class="dia-temp"><span class="max">${maxD}°</span>/<span class="min">${minD}°</span></span>
+                        </div>
+                    `;
                 }
 
             } catch (erro) {
-                console.error("Erro ao atualizar o clima:", erro);
+                console.error("Erro ao carregar clima:", erro);
             }
         }
 
-        // Tradutor de códigos meteorológicos padrão da WMO para Emojis e Descrições em PT
-        function traduzirCodigoClima(code) {
+        // Conversor de códigos de clima WMO para Emojis estilo Google
+        function traduzirCodigoClima(code, isDay) {
             switch (code) {
-                case 0: return { icone: '☀️', descricao: 'Céu limpo' };
+                case 0: 
+                    return { icone: isDay ? '☀️' : '🌙', descricao: isDay ? 'Céu limpo' : 'Céu limpo' };
                 case 1:
-                case 2: return { icone: '⛅', descricao: 'Parcialmente nublado' };
-                case 3: return { icone: '☁️', descricao: 'Nublado' };
+                case 2: 
+                    return { icone: isDay ? '⛅' : '☁️', descricao: 'Parcialmente nublado' };
+                case 3: 
+                    return { icone: '☁️', descricao: 'Nublado' };
                 case 51:
                 case 53:
                 case 55:
                 case 61:
-                case 63: return { icone: '🌧️', descricao: 'Chuva leve' };
+                case 63: 
+                    return { icone: '🌧️', descricao: 'Chuva leve' };
                 case 65:
                 case 80:
                 case 81:
-                case 82: return { icone: '🌧️', descricao: 'Chuva forte' };
+                case 82: 
+                    return { icone: '🌧️', descricao: 'Chuva forte' };
                 case 95:
                 case 96:
-                case 99: return { icone: '⛈️', descricao: 'Tempestade' };
-                default: return { icone: '⛅', descricao: 'Estável' };
+                case 99: 
+                    return { icone: '⛈️', descricao: 'Tempestade' };
+                default: 
+                    return { icone: isDay ? '☀️' : '🌙', descricao: 'Estável' };
             }
         }
 
@@ -309,14 +487,9 @@
             if ('wakeLock' in navigator) {
                 try {
                     wakeLock = await navigator.wakeLock.request('screen');
-                    console.log('Screen Wake Lock Ativo!');
-
-                    wakeLock.addEventListener('release', () => {
-                        console.log('Screen Wake Lock Liberado pelo sistema.');
-                        wakeLock = null;
-                    });
+                    wakeLock.addEventListener('release', () => { wakeLock = null; });
                 } catch (err) {
-                    console.error(`Falha ao ativar Wake Lock: ${err.message}`);
+                    console.error(`Wake Lock erro: ${err.message}`);
                 }
             }
         };
@@ -325,31 +498,26 @@
             if (wakeLock) {
                 wakeLock.release();
                 wakeLock = null;
-                console.log('Screen Wake Lock Liberado.');
             }
         };
 
-        // -----------------------------------------------------------------
-        // INICIALIZAÇÃO
-        // -----------------------------------------------------------------
+        // Inicialização
         atualizarRelogio();
         setInterval(atualizarRelogio, 1000);
 
-        // Busca o clima imediatamente ao carregar e configura para atualizar a cada 1 minuto (60000 ms)
         atualizarClima();
-        setInterval(atualizarClima, 60000);
+        setInterval(atualizarClima, 60000); // Atualiza dados do clima a cada 1 minuto
 
         requestWakeLock();
         
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
                 requestWakeLock();
-                atualizarClima(); // Atualiza também ao retornar para a aba
+                atualizarClima();
             } else {
                 releaseWakeLock();
             }
         });
     </script>
-
 </body>
 </html>
