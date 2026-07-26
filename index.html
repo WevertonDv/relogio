@@ -24,7 +24,7 @@
 
         #relogio {
             color: #ffffff; 
-            font-size: 8em; /* Relógio aumentado */
+            font-size: 8em;
             font-weight: bold;
             text-shadow: 0 0 0px rgba(255, 255, 255, 0.8);
             white-space: nowrap; 
@@ -171,64 +171,23 @@
 
     <!-- Seção de Previsão do Tempo estilo Google -->
     <div id="previsao-container">
-        <div class="local-data">Domingo • Barcelona, RN</div>
+        <div id="local-data" class="local-data">Carregando data...</div>
         
         <div class="clima-principal">
-            <div class="icone-temperatura-grande">⛅</div>
+            <div id="icone-principal" class="icone-temperatura-grande">⏳</div>
             <div class="bloco-temp-nums">
-                32
+                <span id="temp-atual">--</span>
                 <div class="unidade-temp">°C | °F</div>
             </div>
         </div>
 
         <div class="status-chuva">
-            <div class="titulo-condicao">Chuva leve</div>
-            <div class="detalhes-condicao">Máxima: 32° &nbsp;&nbsp; Mínima: 22° &nbsp;&nbsp; Chuva: 35%</div>
+            <div id="condicao-atual" class="titulo-condicao">Atualizando clima...</div>
+            <div id="detalhes-atual" class="detalhes-condicao">Máxima: --° &nbsp;&nbsp; Mínima: --° &nbsp;&nbsp; Chuva: --%</div>
         </div>
 
-        <div class="grade-semana">
-            <div class="dia-coluna">
-                <span class="dia-nome">dom.</span>
-                <span class="dia-icone">🌧️</span>
-                <span class="dia-prob">35%</span>
-                <span class="dia-temps"><span class="max">32°</span><br><span class="min">22°</span></span>
-            </div>
-            <div class="dia-coluna">
-                <span class="dia-nome">seg.</span>
-                <span class="dia-icone">🌧️</span>
-                <span class="dia-prob">50%</span>
-                <span class="dia-temps"><span class="max">32°</span><br><span class="min">23°</span></span>
-            </div>
-            <div class="dia-coluna">
-                <span class="dia-nome">ter.</span>
-                <span class="dia-icone">🌧️</span>
-                <span class="dia-prob">50%</span>
-                <span class="dia-temps"><span class="max">31°</span><br><span class="min">22°</span></span>
-            </div>
-            <div class="dia-coluna">
-                <span class="dia-nome">qua.</span>
-                <span class="dia-icone">☀️</span>
-                <span class="dia-prob">10%</span>
-                <span class="dia-temps"><span class="max">31°</span><br><span class="min">22°</span></span>
-            </div>
-            <div class="dia-coluna">
-                <span class="dia-nome">qui.</span>
-                <span class="dia-icone">☀️</span>
-                <span class="dia-prob">30%</span>
-                <span class="dia-temps"><span class="max">32°</span><br><span class="min">22°</span></span>
-            </div>
-            <div class="dia-coluna">
-                <span class="dia-nome">sex.</span>
-                <span class="dia-icone">🌧️</span>
-                <span class="dia-prob">35%</span>
-                <span class="dia-temps"><span class="max">32°</span><br><span class="min">22°</span></span>
-            </div>
-            <div class="dia-coluna">
-                <span class="dia-nome">sáb.</span>
-                <span class="dia-icone">⛅</span>
-                <span class="dia-prob">15%</span>
-                <span class="dia-temps"><span class="max">32°</span><br><span class="min">21°</span></span>
-            </div>
+        <div class="grade-semana" id="grade-semana">
+            <!-- Preenchido via JavaScript em tempo real -->
         </div>
     </div>
 
@@ -250,6 +209,96 @@
             const elementoRelogio = document.getElementById('relogio');
             if (elementoRelogio) {
                 elementoRelogio.textContent = horaFormatada;
+            }
+        }
+
+        // Função para buscar dados meteorológicos reais de Barcelona, RN via Open-Meteo API
+        async function atualizarClima() {
+            try {
+                // Coordenadas aproximadas para Barcelona, RN (-6.02, -35.93)
+                const latitude = -6.02;
+                const longitude = -35.93;
+                
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=America%2FSao_Paulo`;
+
+                const resposta = await fetch(url);
+                const dados = await resposta.json();
+
+                // Atualizar Data atual formatada (Ex: "Domingo • Barcelona, RN")
+                const hojeObj = new Date();
+                const diasSemanaExtenso = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+                const nomeDiaHoje = diasSemanaExtenso[hojeObj.getDay()];
+                document.getElementById('local-data').textContent = `${nomeDiaHoje} • Barcelona, RN`;
+
+                // Dados Atuais
+                const tempAtual = Math.round(dados.current.temperature_2m);
+                const wcode = dados.current.weather_code;
+                const infoClima = traduzirCodigoClima(wcode);
+
+                document.getElementById('temp-atual').textContent = tempAtual;
+                document.getElementById('icone-principal').textContent = infoClima.icone;
+                document.getElementById('condicao-atual').textContent = infoClima.descricao;
+
+                // Pegar máximas e mínimas do dia atual
+                const maxHoje = Math.round(dados.daily.temperature_2m_max[0]);
+                const minHoje = Math.round(dados.daily.temperature_2m_min[0]);
+                const chuvaHoje = dados.daily.precipitation_probability_max[0] ?? 0;
+
+                document.getElementById('detalhes-atual').innerHTML = `Máxima: ${maxHoje}° &nbsp;&nbsp; Mínima: ${minHoje}° &nbsp;&nbsp; Chuva: ${chuvaHoje}%`;
+
+                // Previsão dos 7 dias da semana
+                const gradeSemana = document.getElementById('grade-semana');
+                gradeSemana.innerHTML = '';
+
+                const diasCurtos = ['dom.', 'seg.', 'ter.', 'qua.', 'qui.', 'sex. कहें', 'sáb.'];
+                
+                for (let i = 0; i < 7; i++) {
+                    const dataIndice = new Date();
+                    dataIndice.setDate(hojeObj.getDate() + i);
+                    const diaSemanaStr = ['dom.', 'seg.', 'ter.', 'qua.', 'qui.', 'sex.', 'sáb.'][dataIndice.getDay()];
+
+                    const codeDia = dados.daily.weather_code[i];
+                    const climaDia = traduzirCodigoClima(codeDia);
+                    const maxDia = Math.round(dados.daily.temperature_2m_max[i]);
+                    const minDia = Math.round(dados.daily.temperature_2m_min[i]);
+                    const probChuvaDia = dados.daily.precipitation_probability_max[i] ?? 0;
+
+                    const colunaHtml = `
+                        <div class="dia-coluna">
+                            <span class="dia-nome">${i === 0 ? 'hoje' : diaSemanaStr}</span>
+                            <span class="dia-icone">${climaDia.icone}</span>
+                            <span class="dia-prob">${probChuvaDia}%</span>
+                            <span class="dia-temps"><span class="max">${maxDia}°</span><br><span class="min">${minDia}°</span></span>
+                        </div>
+                    `;
+                    gradeSemana.innerHTML += colunaHtml;
+                }
+
+            } catch (erro) {
+                console.error("Erro ao atualizar o clima:", erro);
+            }
+        }
+
+        // Tradutor de códigos meteorológicos padrão da WMO para Emojis e Descrições em PT
+        function traduzirCodigoClima(code) {
+            switch (code) {
+                case 0: return { icone: '☀️', descricao: 'Céu limpo' };
+                case 1:
+                case 2: return { icone: '⛅', descricao: 'Parcialmente nublado' };
+                case 3: return { icone: '☁️', descricao: 'Nublado' };
+                case 51:
+                case 53:
+                case 55:
+                case 61:
+                case 63: return { icone: '🌧️', descricao: 'Chuva leve' };
+                case 65:
+                case 80:
+                case 81:
+                case 82: return { icone: '🌧️', descricao: 'Chuva forte' };
+                case 95:
+                case 96:
+                case 99: return { icone: '⛈️', descricao: 'Tempestade' };
+                default: return { icone: '⛅', descricao: 'Estável' };
             }
         }
 
@@ -286,11 +335,16 @@
         atualizarRelogio();
         setInterval(atualizarRelogio, 1000);
 
+        // Busca o clima imediatamente ao carregar e configura para atualizar a cada 1 minuto (60000 ms)
+        atualizarClima();
+        setInterval(atualizarClima, 60000);
+
         requestWakeLock();
         
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
                 requestWakeLock();
+                atualizarClima(); // Atualiza também ao retornar para a aba
             } else {
                 releaseWakeLock();
             }
