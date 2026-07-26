@@ -24,7 +24,7 @@
 
         #relogio {
             color: #ffffff; 
-            font-size: 7em; /* Relógio aumentado conforme solicitado */
+            font-size: 5.5em;
             font-weight: bold;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
             white-space: nowrap; 
@@ -232,7 +232,7 @@
 
         @media (max-width: 480px) {
             #relogio {
-                font-size: 5.2em;
+                font-size: 4em;
             }
         }
     </style>
@@ -357,6 +357,7 @@
                             document.getElementById('condicao-atual').textContent = clima.descricao;
                             document.getElementById('sensacao-termica').textContent = 'Sensação: ' + sensacao + '°';
 
+                            // Horas
                             const containerH = document.getElementById('container-horas');
                             containerH.innerHTML = '';
                             const horaH = new Date().getHours();
@@ -369,6 +370,7 @@
                                 containerH.innerHTML += '<div class="hora-coluna"><span class="temp-h">' + tH + '°</span><span class="icone-h">' + cH.icone + '</span><span>' + lbl + '</span></div>';
                             }
 
+                            // Dias
                             const containerD = document.getElementById('container-dias');
                             containerD.innerHTML = '';
                             const diasNomes = ['dom.', 'seg.', 'ter.', 'qua.', 'qui.', 'sex.', 'sáb.'];
@@ -418,6 +420,7 @@
             }
         }
 
+        // Wake lock compatível com Android antigo se disponível
         const requestWakeLock = async () => {
             if ('wakeLock' in navigator) {
                 try {
